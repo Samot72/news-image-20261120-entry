@@ -1,55 +1,53 @@
-// Entry program for the news-image-20261120 competition entry.
+// news-image-20261120 — antar entry.png ke direktori output harness,
+// lalu buktikan salinannya identik byte demi byte.
 //
-// The artwork being judged ships in this repository as entry.png, in the
-// same directory as this file. When the harness runs the program, it has
-// to place those exact bytes at <output dir>/entry.png and then prove the
-// copy is faithful: same length, same sha256 digest. Any mismatch is a
-// hard failure, never a silent pass. The program makes no network calls
-// and reads nothing outside this directory, so two runs always produce
-// the same bytes.
-
+// Gambarnya sendiri dibuat di tempat lain (broadsheet.html -> entry.png).
+// Program ini hanya memindahkan dan memeriksa pemindahannya.
+// Tanpa network, tanpa mengubah gambar.
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// Anchor every path to this file's own directory, resolved from the
-// module URL, so the program works from any working directory.
-const here: string = dirname(fileURLToPath(import.meta.url));
-const sourcePath: string = join(here, "entry.png");
+const HERE = dirname(fileURLToPath(import.meta.url));
+const SOURCE_NAME = "entry.png";
+const OUTPUT_ENV = "MAKEFUN_OUTPUT_DIR";
+const FALLBACK_DIR = "/output";
 
-// The runner may name an output directory through the environment;
-// otherwise the deliverable belongs in the conventional /output mount.
-const outDir: string = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
-const destPath: string = join(outDir, "entry.png");
-
-// Read the source a single time: the in-memory bytes are both what gets
-// written and the reference the written file is checked against.
-const source: Buffer = readFileSync(sourcePath);
-
-mkdirSync(outDir, { recursive: true });
-writeFileSync(destPath, source);
-
-// First proof: the file on disk must be exactly as long as the source.
-const onDisk: Buffer = readFileSync(destPath);
-if (onDisk.length !== source.length) {
-  throw new Error(
-    `length mismatch: source is ${source.length} bytes, wrote ${onDisk.length}`,
-  );
+function sha256Hex(buf: Buffer): string {
+  return createHash("sha256").update(buf).digest("hex");
 }
 
-// Second proof: equal length can still hide flipped bytes, so compare
-// sha256 digests of the source and of what actually landed on disk.
-const digest = (bytes: Buffer): string =>
-  createHash("sha256").update(bytes).digest("hex");
-const sourceDigest: string = digest(source);
-const diskDigest: string = digest(onDisk);
-if (diskDigest !== sourceDigest) {
-  throw new Error(
-    `sha256 mismatch: source ${sourceDigest}, on disk ${diskDigest}`,
-  );
+async function main(): Promise<void> {
+  const sourcePath = resolve(HERE, SOURCE_NAME);
+  const outDir = process.env[OUTPUT_ENV] ?? FALLBACK_DIR;
+  const destPath = join(outDir, SOURCE_NAME);
+
+  // Baca gambar tepat satu kali; semua langkah berikut memakai bytes ini.
+  const original = await readFile(sourcePath);
+  const originalHash = sha256Hex(original);
+
+  await mkdir(outDir, { recursive: true });
+  await writeFile(destPath, original);
+
+  // Baca balik salinannya, lalu bandingkan dengan sumbernya.
+  const copied = await readFile(destPath);
+  const copiedHash = sha256Hex(copied);
+
+  if (copied.length !== original.length) {
+    throw new Error(
+      `panjang beda: sumber ${original.length} byte, salinan ${copied.length} byte`,
+    );
+  }
+  if (copiedHash !== originalHash) {
+    throw new Error(`sha256 beda: sumber ${originalHash}, salinan ${copiedHash}`);
+  }
+
+  // Panjang sudah diketahui dari buffer yang dibaca balik; tidak perlu stat lagi.
+  console.log(`ok: ${destPath} (${copied.length} byte, sha256 ${copiedHash})`);
 }
 
-console.log(
-  `entry.png delivered: ${onDisk.length} bytes, sha256 ${diskDigest} -> ${destPath}`,
-);
+main().catch((err: unknown) => {
+  console.error(err instanceof Error ? err.message : err);
+  process.exit(1);
+});

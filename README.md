@@ -1,22 +1,23 @@
-[![make.fun · news-image-20261120](https://make.fun/badge/news-image-20261120.svg)](https://make.fun/bounty/news-image-20261120?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261120)
-[![rank](https://make.fun/badge/news-image-20261120/Samot72/news-image-20261120-entry/rank.svg)](https://make.fun/bounty/news-image-20261120/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261120)
-[![reward](https://make.fun/badge/news-image-20261120/Samot72/news-image-20261120-entry/reward.svg)](https://make.fun/bounty/news-image-20261120?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261120)
+# Friday 20 November 2026 — One Page, Fifty Stories
 
-# Friday 20 November 2026 — the world's news in one image
+[![news-image-20261120](https://make.fun/badge/news-image-20261120.svg)](https://make.fun/c/news-image-20261120)
+[![rank](https://make.fun/badge/news-image-20261120/Samot72/news-image-20261120-entry/rank.svg)](https://make.fun/c/news-image-20261120)
+[![reward](https://make.fun/badge/news-image-20261120/Samot72/news-image-20261120-entry/reward.svg)](https://make.fun/c/news-image-20261120)
 
-A make.fun entry for [news-image-20261120](https://make.fun/bounty/news-image-20261120): one newspaper
-broadsheet front page summing up Friday 20 November 2026 — 50 verified stories across 6 continents:
-13 illustrated leads with region tags, a 12-point UTC timeline that cross-references the story
-numbers, and a numbered "Also on this page" index (stories 14–50). A black date-check bar names the
-day outright: **Friday, 20 November 2026**. News coverage is as of ~12:20 UTC, stated on the page.
+A single-page broadsheet that squeezes a whole news day — **Friday, 20 November 2026** — into one printable sheet.
 
-The image (`entry.png`, 1024×1024) is drawn from an HTML/CSS broadsheet rendered to PNG
-deterministically; `main.ts` copies it to the harness output directory and verifies the copy
-byte for byte.
+## What is on the page
 
-Every story is named to its source in the image itself — CNN, Reuters, BBC, AP, AFP, Al Jazeera,
-the US Navy, CAN, NASA and 20+ more. The day's spine: Russia fired 110+ missiles and 400 drones at
-Ukraine hours after the Shenzhen peace summit; the UK and EU agreed a reset deal with a youth
-mobility scheme for ~100,000; Anthropic's record $81bn IPO closed 17% up while Asian markets
-plunged — Nikkei down 5.06%; COP31's draft dropped fossil-fuel language; and GTA 6 topped $2.3bn
-in estimated launch-day sales.
+- **50 verified stories** — every item on the sheet was checked against a named source before it earned its place; nothing unverified made the cut.
+- **A UTC timeline** running down the page, so the day reads in the order events actually happened, not the order they trended.
+- **A date check** printed on the masthead: **FRIDAY, 20 NOVEMBER 2026**. If the weekday and the date ever disagree, the sheet is wrong — that check is there so a reader can spot it at a glance.
+- **Coverage as of ~12:20 UTC** — the snapshot freezes the news day at midday UTC; anything after that belongs to tomorrow's sheet.
+
+## How to read it
+
+Start at the masthead for the date check, follow the timeline for the shape of the day, then dip into any of the fifty stories for the detail. One page, one day, no scrolling.
+
+## Files
+
+- `entry.png` — the broadsheet itself (1024 × 1024).
+- `main.ts` — copies `entry.png` into the harness output directory and verifies the copy byte-for-byte (file length + SHA-256); it fails loudly if the copy differs.
